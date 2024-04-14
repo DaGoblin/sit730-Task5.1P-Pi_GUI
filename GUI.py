@@ -3,6 +3,7 @@ from PyQt5.QtGui import QCloseEvent
 from PyQt5.QtWidgets import QApplication, QMainWindow
 import sys
 import RPi.GPIO as GPIO
+import time
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(26, GPIO.OUT)
@@ -33,6 +34,15 @@ class MainWindow(QMainWindow):
         self.radioBtn3.move(50,150)
         self.radioBtn3.toggled.connect(self.blueLED)
 
+        self.textBox = QtWidgets.QLineEdit(self)
+        self.textBox.move(50,200)
+        self.textBox.resize(200,40)
+        self.textBox.returnPressed.connect(self.textBoxReturn)
+
+        self.label = QtWidgets.QLabel(self)
+        self.label.move(50,250)
+        self.label.resize(200,40)
+
     def redLED(self):
         if self.radioBtn1.isChecked():
             GPIO.output(5, GPIO.HIGH)
@@ -52,9 +62,30 @@ class MainWindow(QMainWindow):
         else:
             GPIO.output(26, GPIO.LOW)
 
+    def textBoxReturn(self):
+        inputText = self.textBox.text()
+        inputText.lower()
+        
+        if inputText == "red":
+            self.radioBtn1.setChecked(True)
+            self.clearText()
+        elif inputText == "green":
+            self.radioBtn2.setChecked(True)
+            self.clearText()
+        elif inputText == "blue":
+            self.radioBtn3.setChecked(True)
+            self.clearText()
+        else:
+            self.label.setText("Entry not valid") 
+            self.textBox.setText("")
+    def clearText(self):
+            self.label.setText("") 
+            self.textBox.setText("")
+
     def closeEvent(self, *args, **kwargs):
         super(QMainWindow, self).closeEvent(*args, **kwargs)
         allLEDsOff()
+
 
 def window():
     app = QApplication(sys.argv)
